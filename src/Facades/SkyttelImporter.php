@@ -7,8 +7,8 @@ use Ragnarok\Skyttel\Services\SkyttelImporter as SImporter;
 
 class SkyttelImporter extends Facade
 {
-	protected static function getFacadeAccessor(): string
-	{
-		return SImporter::class;
-	}
+    protected static function getFacadeAccessor(): string
+    {
+        return SImporter::class;
+    }
 }

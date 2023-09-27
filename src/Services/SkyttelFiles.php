@@ -11,10 +11,10 @@ use Ragnarok\Sink\Traits\LogPrintf;
 
 class SkyttelFiles
 {
-	use LogPrintf;
+    use LogPrintf;
 
-	public function __construct()
-	{
-		$this->logPrintfInit('[SkyttelService]: ');
-	}
+    public function __construct()
+    {
+        $this->logPrintfInit('[SkyttelService]: ');
+    }
 }

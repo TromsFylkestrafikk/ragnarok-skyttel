@@ -7,8 +7,8 @@ use Ragnarok\Skyttel\Services\SkyttelFiles as SFiles;
 
 class SkyttelFiles extends Facade
 {
-	protected static function getFacadeAccessor(): string
-	{
-		return SFiles::class;
-	}
+    protected static function getFacadeAccessor(): string
+    {
+        return SFiles::class;
+    }
 }

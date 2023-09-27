@@ -7,13 +7,13 @@ use Ragnarok\Skyttel\Facades\SkyttelFiles;
 
 class SkyttelImporter
 {
-	public function import($dateStr)
-	{
-		return $this;
-	}
+    public function import($dateStr)
+    {
+        return $this;
+    }
 
-	public function deleteImport($dateStr)
-	{
-		return $this;
-	}
+    public function deleteImport($dateStr)
+    {
+        return $this;
+    }
 }

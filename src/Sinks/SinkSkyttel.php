@@ -11,15 +11,15 @@ use Ragnarok\Sink\Traits\LogPrintf;
 
 class SinkSkyttel extends SinkBase
 {
-	use LogPrintf;
+    use LogPrintf;
 
-	public $id = "skyttel";
-	public $title = "Skyttel";
+    public $id = "skyttel";
+    public $title = "Skyttel";
 
-	public function __construct()
-	{
-		$this->logPrintfInit('[SinkSkyttel]: ');
-	}
+    public function __construct()
+    {
+        $this->logPrintfInit('[SinkSkyttel]: ');
+    }
 
     /**
      * @inheritdoc
@@ -34,7 +34,7 @@ class SinkSkyttel extends SinkBase
      */
     public function getToDate(): Carbon
     {
-    	return today()->subDay();
+        return today()->subDay();
     }
 
     /**
@@ -42,7 +42,7 @@ class SinkSkyttel extends SinkBase
      */
     public function fetch($id): bool
     {
-    	return true;
+        return true;
     }
 
     /**
@@ -50,7 +50,7 @@ class SinkSkyttel extends SinkBase
      */
     public function removeChunk($id): bool
     {
-    	return true;
+        return true;
     }
 
     /**
@@ -58,7 +58,7 @@ class SinkSkyttel extends SinkBase
      */
     public function import($id): bool
     {
-    	return true;
+        return true;
     }
 
     /**
@@ -66,6 +66,6 @@ class SinkSkyttel extends SinkBase
      */
     public function deleteImport($id): bool
     {
-    	return true;
+        return true;
     }
 }
