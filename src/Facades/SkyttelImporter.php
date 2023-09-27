@@ -5,7 +5,7 @@ namespace Ragnarok\Skyttel\Facades;
 use Illuminate\Support\Facades\Facade;
 use Ragnarok\Skyttel\Services\SkyttelImporter as SImporter;
 
-class ConsatImporter extends Facade
+class SkyttelImporter extends Facade
 {
 	protected static function getFacadeAccessor(): string
 	{
