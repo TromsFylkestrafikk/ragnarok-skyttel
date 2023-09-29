@@ -13,8 +13,8 @@ class SinkSkyttel extends SinkBase
 {
     use LogPrintf;
 
-    public $id = "skyttel";
-    public $title = "Skyttel";
+    public static $id = "skyttel";
+    public static $title = "Skyttel";
 
     public function __construct()
     {
