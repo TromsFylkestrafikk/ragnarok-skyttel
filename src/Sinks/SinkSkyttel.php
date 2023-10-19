@@ -4,6 +4,7 @@ namespace Ragnarok\Skyttel\Sinks;
 
 //use Exception;
 use Illuminate\Support\Carbon;
+use Ragnarok\Sink\Models\RawFile;
 use Ragnarok\Sink\Services\LocalFiles;
 use Ragnarok\Sink\Sinks\SinkBase;
 use Ragnarok\Sink\Traits\LogPrintf;
@@ -16,6 +17,11 @@ class SinkSkyttel extends SinkBase
 
     public static $id = "skyttel";
     public static $title = "Skyttel";
+
+    /**
+     * @var LocalFiles
+     */
+    protected $skyttelFiles = null;
 
     public function __construct()
     {
@@ -44,6 +50,7 @@ class SinkSkyttel extends SinkBase
      */
     public function fetch($id): bool
     {
+        $this->skyttelFiles->setPath();
         foreach (SkyttelFiles::getRemoteFileList($this->dateFilter($id)) as $filename) {
             $content = SkyttelFiles::getRemoteFile($filename);
             if (!$this->skyttelFiles->toFile($filename, $content)) {
@@ -58,8 +65,9 @@ class SinkSkyttel extends SinkBase
      */
     public function removeChunk($id): bool
     {
+        $this->skyttelFiles->setPath(SkyttelFiles::getSubDir());
         foreach ($this->getLocalFileList($this->dateFilter($id)) as $filename) {
-            $this->skyttelFiles->rmfile($filename);
+            $this->skyttelFiles->rmfile(basename($filename));
         }
         return true;
     }
@@ -82,17 +90,7 @@ class SinkSkyttel extends SinkBase
 
     protected function getLocalFileList($dateFilter)
     {
-        $this->skyttelFiles->setPath(SkyttelFiles::getSubDir());
-        $localDir = $this->skyttelFiles->getLocalDir();
-        $localFiles = [];
-        foreach ($this->skyttelFiles->getDisk()->files($localDir) as $candidate) {
-            $filename = basename($candidate);
-            $extension = strtolower(substr($candidate, -4));
-            if (($extension === '.xml') && (strpos($filename, $dateFilter) !== false)) {
-                $localFiles[] = $filename;
-            }
-        }
-        return $localFiles;
+        return RawFile::where('name', 'LIKE', '%' . $dateFilter . '%')->pluck('name');
     }
 
     protected function dateFilter($id)
