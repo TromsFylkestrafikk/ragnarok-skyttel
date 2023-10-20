@@ -76,7 +76,6 @@ class SinkSkyttel extends SinkBase
      */
     public function import($id): bool
     {
-        $this->skyttelFiles->setPath();
         foreach ($this->getLocalFileList($this->dateFilter($id)) as $filename) {
             $filePath = $this->skyttelFiles->getDisk()->path($filename);
             SkyttelImporter::import($filePath);
@@ -89,7 +88,6 @@ class SinkSkyttel extends SinkBase
      */
     public function deleteImport($id): bool
     {
-        $this->skyttelFiles->setPath();
         foreach ($this->getLocalFileList($this->dateFilter($id)) as $filename) {
             SkyttelImporter::deleteImport(basename($filename));
         }
