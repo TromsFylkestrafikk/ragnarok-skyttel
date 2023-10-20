@@ -2,14 +2,13 @@
 
 namespace Ragnarok\Skyttel\Sinks;
 
-//use Exception;
 use Illuminate\Support\Carbon;
 use Ragnarok\Sink\Models\RawFile;
 use Ragnarok\Sink\Services\LocalFiles;
 use Ragnarok\Sink\Sinks\SinkBase;
 use Ragnarok\Sink\Traits\LogPrintf;
 use Ragnarok\Skyttel\Facades\SkyttelFiles;
-//use Ragnarok\Skyttel\Facades\SkyttelImporter;
+use Ragnarok\Skyttel\Facades\SkyttelImporter;
 
 class SinkSkyttel extends SinkBase
 {
@@ -77,6 +76,10 @@ class SinkSkyttel extends SinkBase
      */
     public function import($id): bool
     {
+        foreach ($this->getLocalFileList($this->dateFilter($id)) as $filename) {
+            $filePath = $this->skyttelFiles->getDisk()->path($filename);
+            SkyttelImporter::import($filePath);
+        }
         return true;
     }
 
@@ -85,6 +88,9 @@ class SinkSkyttel extends SinkBase
      */
     public function deleteImport($id): bool
     {
+        foreach ($this->getLocalFileList($this->dateFilter($id)) as $filename) {
+            SkyttelImporter::deleteImport(basename($filename));
+        }
         return true;
     }
 
