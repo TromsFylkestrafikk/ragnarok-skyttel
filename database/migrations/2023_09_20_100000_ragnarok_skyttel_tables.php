@@ -16,7 +16,7 @@ return new class extends Migration
             $table->id();
             $table->char('filename', 128)->index();
             $table->boolean('succeeded');
-            $table->dateTime('FileCreatedDate');
+            $table->dateTime('FileCreatedDate')->nullable();
             $table->timestamps();
         });
 
@@ -50,8 +50,8 @@ return new class extends Migration
             $table->char('StopPlaceIDExit', 24);
             $table->boolean('Trailer')->default(false);
             $table->integer('SignalCode');
-            $table->integer('MeasuredLength');
-            $table->integer('Margin');
+            $table->integer('MeasuredLength')->nullable();
+            $table->integer('Margin')->nullable();
             $table->char('TariffClass', 16);
             $table->char('LPNFront', 16);
             $table->integer('NationLPNFront');
@@ -68,8 +68,8 @@ return new class extends Migration
             $table->id();
             $table->unsignedInteger('trip_id')->index();
             $table->char('Debit_Credit', 8);
-            $table->char('TicketCodeCharged', 8);
-            $table->char('TicketCodeChargedToll', 8);
+            $table->char('TicketCodeCharged', 8)->nullable();
+            $table->char('TicketCodeChargedToll', 8)->nullable();
             $table->char('ChargedType', 16);
             $table->char('ZeroEmission', 2);
             $table->float('FullPrice');
@@ -85,7 +85,7 @@ return new class extends Migration
             $table->float('ChargedAmountVATRateToll');
             $table->float('ChargedNetAmountToll');
             $table->char('InformationCode');
-            $table->char('IssuerIDCharged');
+            $table->char('IssuerIDCharged')->nullable();
             $table->float('OBUIssuerFee');
             $table->float('OBUIssuerFeeVAT');
             $table->float('OBUIssuerFeeVATRate');
