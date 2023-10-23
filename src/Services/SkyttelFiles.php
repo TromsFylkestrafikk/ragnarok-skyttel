@@ -45,11 +45,6 @@ class SkyttelFiles
         return $this->getRemoteDisk()->get($filePath);
     }
 
-    public function getSubDir()
-    {
-        return self::SUBDIR;
-    }
-
     protected function getRemoteDisk(): Filesystem
     {
         if ($this->remoteDisk === null) {

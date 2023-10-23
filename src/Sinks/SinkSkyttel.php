@@ -49,10 +49,10 @@ class SinkSkyttel extends SinkBase
      */
     public function fetch($id): bool
     {
-        $this->skyttelFiles->setPath();
+        $this->skyttelFiles->setPath($id);
         foreach (SkyttelFiles::getRemoteFileList($this->dateFilter($id)) as $filename) {
             $content = SkyttelFiles::getRemoteFile($filename);
-            if (!$this->skyttelFiles->toFile($filename, $content)) {
+            if (!$this->skyttelFiles->toFile(basename($filename), $content)) {
                 return false;
             }
         }
@@ -64,7 +64,7 @@ class SinkSkyttel extends SinkBase
      */
     public function removeChunk($id): bool
     {
-        $this->skyttelFiles->setPath(SkyttelFiles::getSubDir());
+        $this->skyttelFiles->setPath($id);
         foreach ($this->getLocalFileList($this->dateFilter($id)) as $filename) {
             $this->skyttelFiles->rmfile(basename($filename));
         }
