@@ -125,7 +125,6 @@ class SkyttelImporter
         if (!$batch) {
             return;
         }
-        $this->debug("Flushing stored transactions");
         $batch->succeeded = false;
         $batch->save();
         $transIds = $batch->transactions->pluck('id');
