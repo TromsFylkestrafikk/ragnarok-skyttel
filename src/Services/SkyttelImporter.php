@@ -28,7 +28,7 @@ class SkyttelImporter
     protected $xmlFileName;
 
     /**
-     * @var Ragnarok\Skyttel\Models\Batch
+     * @var \Ragnarok\Skyttel\Models\Batch
      */
     protected $batch;
 
@@ -85,6 +85,11 @@ class SkyttelImporter
         $this->createModelsFromXml(Trip::class, $transXml->Trip, $additional, function ($trip, $simpleTrip) {
             $this->createModelsFromXml(Receipt::class, $simpleTrip->ReceiptPart, ['trip_id' => $trip->id]);
         });
+    }
+
+    public function getTransactionCount(): int
+    {
+        return $this->countTransactions;
     }
 
     /**

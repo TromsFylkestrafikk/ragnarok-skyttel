@@ -47,16 +47,19 @@ class SinkSkyttel extends SinkBase
     /**
      * @inheritdoc
      */
-    public function fetch($id): bool
+    public function fetch($id): int
     {
         $this->skyttelFiles->setPath($id);
+        $filesSize = 0;
         foreach (SkyttelFiles::getRemoteFileList($this->dateFilter($id)) as $filename) {
             $content = SkyttelFiles::getRemoteFile($filename);
-            if (!$this->skyttelFiles->toFile(basename($filename), $content)) {
-                return false;
+            $file = $this->skyttelFiles->toFile(basename($filename), $content);
+            if (!$file) {
+                return 0;
             }
+            $filesSize += $file->size;
         }
-        return true;
+        return $filesSize;
     }
 
     /**
@@ -74,13 +77,14 @@ class SinkSkyttel extends SinkBase
     /**
      * @inheritdoc
      */
-    public function import($id): bool
+    public function import($id): int
     {
+        $count = 0;
         foreach ($this->getLocalFileList($this->dateFilter($id)) as $filename) {
             $filePath = $this->skyttelFiles->getDisk()->path($filename);
-            SkyttelImporter::import($filePath);
+            $count += SkyttelImporter::import($filePath)->getTransactionCount();
         }
-        return true;
+        return $count;
     }
 
     /**
