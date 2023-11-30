@@ -3,7 +3,7 @@
 namespace Ragnarok\Skyttel\Sinks;
 
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Collection;
 use Ragnarok\Sink\Models\RawFile;
 use Ragnarok\Sink\Services\LocalFiles;
 use Ragnarok\Sink\Sinks\SinkBase;
@@ -82,11 +82,19 @@ class SinkSkyttel extends SinkBase
     /**
      * @inheritdoc
      */
+    public function getChunkFiles(string $id): Collection
+    {
+        return $this->getLocalFiles($id);
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function removeChunk($id): bool
     {
         $this->skyttelFiles->setPath($id);
-        foreach ($this->getLocalFileList($this->dateFilter($id)) as $filename) {
-            $this->skyttelFiles->rmfile(basename($filename));
+        foreach ($this->getLocalFiles($id) as $file) {
+            $this->skyttelFiles->rmFile(basename($file->name));
         }
         return true;
     }
@@ -97,8 +105,8 @@ class SinkSkyttel extends SinkBase
     public function import($id): int
     {
         $count = 0;
-        foreach ($this->getLocalFileList($this->dateFilter($id)) as $filename) {
-            $filePath = $this->skyttelFiles->getDisk()->path($filename);
+        foreach ($this->getLocalFiles($id) as $file) {
+            $filePath = $this->skyttelFiles->getDisk()->path($file->name);
             $count += SkyttelImporter::import($filePath)->getTransactionCount();
         }
         return $count;
@@ -109,8 +117,8 @@ class SinkSkyttel extends SinkBase
      */
     public function deleteImport($chunkId): bool
     {
-        foreach ($this->getLocalFileList($this->dateFilter($chunkId)) as $filename) {
-            SkyttelImporter::deleteImport(basename($filename));
+        foreach ($this->getLocalFiles($chunkId) as $file) {
+            SkyttelImporter::deleteImport(basename($file->name));
         }
         return true;
     }
@@ -121,20 +129,21 @@ class SinkSkyttel extends SinkBase
     protected function getChecksum(string $chunkId): string
     {
         if (!isset($this->checksums[$chunkId])) {
-            $this->checksums[$chunkId] = $this->getLocalFiles($chunkId)->pluck('checksums')->keyBy('name')->toArray();
+            $this->checksums[$chunkId] = $this->getLocalFiles($chunkId)
+                ->pluck('checksums')
+                ->keyBy('name')
+                ->toArray();
             ksort($this->checksums[$chunkId]);
         }
         return md5(implode('', $this->checksums[$chunkId]));
     }
 
-    protected function getLocalFileList(string $dateStr): Collection
+    /**
+     * @return Collection<array-key, RawFile>
+     */
+    protected function getLocalFiles(string $chunkId): Collection
     {
-        return $this->getLocalFiles($dateStr)->pluck('name');
-    }
-
-    protected function getLocalFiles(string $dateStr): Collection
-    {
-        return RawFile::where('name', 'LIKE', sprintf('%%%s%%', $this->dateFilter($dateStr)))->get();
+        return $this->skyttelFiles->getFilesLike(sprintf('%%%s%%', $this->dateFilter($chunkId)));
     }
 
     protected function dateFilter(string $chunkId): string
