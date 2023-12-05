@@ -5,6 +5,7 @@ namespace Ragnarok\Skyttel\Sinks;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Ragnarok\Sink\Models\RawFile;
+use Ragnarok\Sink\Services\ChunkArchive;
 use Ragnarok\Sink\Services\LocalFiles;
 use Ragnarok\Sink\Sinks\SinkBase;
 use Ragnarok\Sink\Traits\LogPrintf;
@@ -22,11 +23,6 @@ class SinkSkyttel extends SinkBase
      * @var LocalFiles
      */
     protected $skyttelFiles = null;
-
-    /**
-     * @var string[]
-     */
-    protected $checksums = [];
 
     public function __construct()
     {
@@ -55,36 +51,13 @@ class SinkSkyttel extends SinkBase
      */
     public function fetch($id): int
     {
-        $this->skyttelFiles->setPath($id);
-        $filesSize = 0;
-        $this->checksums[$id] = [];
+        $archive = new ChunkArchive(static::$id, $id);
         foreach (SkyttelFiles::getRemoteFileList($this->dateFilter($id)) as $filename) {
             $content = SkyttelFiles::getRemoteFile($filename);
-            $file = $this->skyttelFiles->toFile(basename($filename), $content);
-            if (!$file) {
-                return 0;
-            }
-            $this->checksums[$id][$file->name] = $file->checksum;
-            $filesSize += $file->size;
+            $archive->addFromString(basename($filename), $content);
         }
-        ksort($this->checksums[$id]);
-        return $filesSize;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getChunkVersion($chunkId): string
-    {
-        return $this->getChecksum($chunkId);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getChunkFiles(string $id): Collection
-    {
-        return $this->getLocalFiles($id);
+        $file = $archive->save()->getFile();
+        return $files->size;
     }
 
     /**
