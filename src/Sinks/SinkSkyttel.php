@@ -63,13 +63,9 @@ class SinkSkyttel extends SinkBase
     /**
      * @inheritdoc
      */
-    public function removeChunk($id): bool
+    public function getChunkFile(string $id): RawFile|null
     {
-        $this->skyttelFiles->setPath($id);
-        foreach ($this->getLocalFiles($id) as $file) {
-            $this->skyttelFiles->rmFile(basename($file->name));
-        }
-        return true;
+        return $this->skyttelFiles->getFile((new ChunkArchive(static::$id, $id))->getFilename());
     }
 
     /**
