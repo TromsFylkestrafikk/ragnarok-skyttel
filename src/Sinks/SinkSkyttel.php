@@ -4,7 +4,7 @@ namespace Ragnarok\Skyttel\Sinks;
 
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Collection;
-use Ragnarok\Sink\Models\RawFile;
+use Ragnarok\Sink\Models\SinkFile;
 use Ragnarok\Sink\Services\ChunkArchive;
 use Ragnarok\Sink\Services\LocalFiles;
 use Ragnarok\Sink\Sinks\SinkBase;
@@ -49,23 +49,14 @@ class SinkSkyttel extends SinkBase
     /**
      * @inheritdoc
      */
-    public function fetch($id): int
+    public function fetch($id): SinkFile|null
     {
         $archive = new ChunkArchive(static::$id, $id);
         foreach (SkyttelFiles::getRemoteFileList($this->dateFilter($id)) as $filename) {
             $content = SkyttelFiles::getRemoteFile($filename);
             $archive->addFromString(basename($filename), $content);
         }
-        $file = $archive->save()->getFile();
-        return $files->size;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getChunkFile(string $id): RawFile|null
-    {
-        return $this->skyttelFiles->getFile((new ChunkArchive(static::$id, $id))->getFilename());
+        return $archive->save()->getFile();
     }
 
     /**
@@ -108,7 +99,7 @@ class SinkSkyttel extends SinkBase
     }
 
     /**
-     * @return Collection<array-key, RawFile>
+     * @return Collection<array-key, SinkFile>
      */
     protected function getLocalFiles(string $chunkId): Collection
     {
