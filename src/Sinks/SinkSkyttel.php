@@ -6,6 +6,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Ragnarok\Sink\Models\SinkFile;
 use Ragnarok\Sink\Services\ChunkArchive;
+use Ragnarok\Sink\Services\ChunkExtractor;
 use Ragnarok\Sink\Services\LocalFiles;
 use Ragnarok\Sink\Sinks\SinkBase;
 use Ragnarok\Sink\Traits\LogPrintf;
@@ -49,7 +50,7 @@ class SinkSkyttel extends SinkBase
     /**
      * @inheritdoc
      */
-    public function fetch($id): SinkFile|null
+    public function fetch(string $id): SinkFile|null
     {
         $archive = new ChunkArchive(static::$id, $id);
         foreach (SkyttelFiles::getRemoteFileList($this->dateFilter($id)) as $filename) {
@@ -62,12 +63,12 @@ class SinkSkyttel extends SinkBase
     /**
      * @inheritdoc
      */
-    public function import($id): int
+    public function import(string $id, SinkFile $file): int
     {
         $count = 0;
-        foreach ($this->getLocalFiles($id) as $file) {
-            $filePath = $this->skyttelFiles->getDisk()->path($file->name);
-            $count += SkyttelImporter::import($filePath)->getTransactionCount();
+        $extractor = new ChunkExtractor(static::$id, $file);
+        foreach ($extractor->getFiles() as $filepath) {
+            $count += SkyttelImporter::import($filepath)->getTransactionCount();
         }
         return $count;
     }
@@ -75,27 +76,12 @@ class SinkSkyttel extends SinkBase
     /**
      * @inheritdoc
      */
-    public function deleteImport($chunkId): bool
+    public function deleteImport(string $chunkId): bool
     {
         foreach ($this->getLocalFiles($chunkId) as $file) {
             SkyttelImporter::deleteImport(basename($file->name));
         }
         return true;
-    }
-
-    /**
-     * Create one checksum for all files for given chunk ID.
-     */
-    protected function getChecksum(string $chunkId): string
-    {
-        if (!isset($this->checksums[$chunkId])) {
-            $this->checksums[$chunkId] = $this->getLocalFiles($chunkId)
-                ->pluck('checksums')
-                ->keyBy('name')
-                ->toArray();
-            ksort($this->checksums[$chunkId]);
-        }
-        return md5(implode('', $this->checksums[$chunkId]));
     }
 
     /**
