@@ -3,11 +3,9 @@
 namespace Ragnarok\Skyttel\Sinks;
 
 use Illuminate\Support\Carbon;
-use Illuminate\Database\Eloquent\Collection;
 use Ragnarok\Sink\Models\SinkFile;
 use Ragnarok\Sink\Services\ChunkArchive;
 use Ragnarok\Sink\Services\ChunkExtractor;
-use Ragnarok\Sink\Services\LocalFiles;
 use Ragnarok\Sink\Sinks\SinkBase;
 use Ragnarok\Sink\Traits\LogPrintf;
 use Ragnarok\Skyttel\Facades\SkyttelFiles;
@@ -20,15 +18,9 @@ class SinkSkyttel extends SinkBase
     public static $id = "skyttel";
     public static $title = "Skyttel";
 
-    /**
-     * @var LocalFiles
-     */
-    protected $skyttelFiles = null;
-
     public function __construct()
     {
         $this->logPrintfInit('[SinkSkyttel]: ');
-        $this->skyttelFiles = new LocalFiles(static::$id);
     }
 
     /**
@@ -76,20 +68,13 @@ class SinkSkyttel extends SinkBase
     /**
      * @inheritdoc
      */
-    public function deleteImport(string $chunkId): bool
+    public function deleteImport(string $chunkId, SinkFile $file): bool
     {
-        foreach ($this->getLocalFiles($chunkId) as $file) {
-            SkyttelImporter::deleteImport(basename($file->name));
+        $extractor = new ChunkExtractor(static::$id, $file);
+        foreach ($extractor->getFiles() as $filepath) {
+            SkyttelImporter::deleteImport(basename($filepath));
         }
         return true;
-    }
-
-    /**
-     * @return Collection<array-key, SinkFile>
-     */
-    protected function getLocalFiles(string $chunkId): Collection
-    {
-        return $this->skyttelFiles->getFilesLike(sprintf('%%%s%%', $this->dateFilter($chunkId)));
     }
 
     protected function dateFilter(string $chunkId): string
