@@ -7,21 +7,13 @@ use Ragnarok\Sink\Models\SinkFile;
 use Ragnarok\Sink\Services\ChunkArchive;
 use Ragnarok\Sink\Services\ChunkExtractor;
 use Ragnarok\Sink\Sinks\SinkBase;
-use Ragnarok\Sink\Traits\LogPrintf;
 use Ragnarok\Skyttel\Facades\SkyttelFiles;
 use Ragnarok\Skyttel\Facades\SkyttelImporter;
 
 class SinkSkyttel extends SinkBase
 {
-    use LogPrintf;
-
     public static $id = "skyttel";
     public static $title = "Skyttel";
-
-    public function __construct()
-    {
-        $this->logPrintfInit('[SinkSkyttel]: ');
-    }
 
     /**
      * @inheritdoc
