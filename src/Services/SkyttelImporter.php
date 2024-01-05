@@ -43,7 +43,6 @@ class SkyttelImporter
 
     public function import($file)
     {
-        $this->debug('Importing %s', $file);
         $this->xmlFileName = basename($file);
         $this->batch = null;
         $batch = $this->getBatch(true);
@@ -60,7 +59,7 @@ class SkyttelImporter
         // Update status.
         $batch->succeeded = true;
         $batch->save();
-        $this->info('Import success: %d transactions', $this->countTransactions);
+        $this->debug('%s: Imported %d transactions', $this->xmlFileName, $this->countTransactions);
         return $this;
     }
 

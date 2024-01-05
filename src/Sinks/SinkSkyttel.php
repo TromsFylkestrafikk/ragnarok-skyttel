@@ -3,36 +3,17 @@
 namespace Ragnarok\Skyttel\Sinks;
 
 use Illuminate\Support\Carbon;
-use Illuminate\Database\Eloquent\Collection;
-use Ragnarok\Sink\Models\RawFile;
-use Ragnarok\Sink\Services\LocalFiles;
+use Ragnarok\Sink\Models\SinkFile;
+use Ragnarok\Sink\Services\ChunkArchive;
+use Ragnarok\Sink\Services\ChunkExtractor;
 use Ragnarok\Sink\Sinks\SinkBase;
-use Ragnarok\Sink\Traits\LogPrintf;
 use Ragnarok\Skyttel\Facades\SkyttelFiles;
 use Ragnarok\Skyttel\Facades\SkyttelImporter;
 
 class SinkSkyttel extends SinkBase
 {
-    use LogPrintf;
-
     public static $id = "skyttel";
     public static $title = "Skyttel";
-
-    /**
-     * @var LocalFiles
-     */
-    protected $skyttelFiles = null;
-
-    /**
-     * @var string[]
-     */
-    protected $checksums = [];
-
-    public function __construct()
-    {
-        $this->logPrintfInit('[SinkSkyttel]: ');
-        $this->skyttelFiles = new LocalFiles(static::$id);
-    }
 
     /**
      * @inheritdoc
@@ -53,61 +34,25 @@ class SinkSkyttel extends SinkBase
     /**
      * @inheritdoc
      */
-    public function fetch($id): int
+    public function fetch(string $id): SinkFile|null
     {
-        $this->skyttelFiles->setPath($id);
-        $filesSize = 0;
-        $this->checksums[$id] = [];
+        $archive = new ChunkArchive(static::$id, $id);
         foreach (SkyttelFiles::getRemoteFileList($this->dateFilter($id)) as $filename) {
             $content = SkyttelFiles::getRemoteFile($filename);
-            $file = $this->skyttelFiles->toFile(basename($filename), $content);
-            if (!$file) {
-                return 0;
-            }
-            $this->checksums[$id][$file->name] = $file->checksum;
-            $filesSize += $file->size;
+            $archive->addFromString(basename($filename), $content);
         }
-        ksort($this->checksums[$id]);
-        return $filesSize;
+        return $archive->save()->getFile();
     }
 
     /**
      * @inheritdoc
      */
-    public function getChunkVersion($chunkId): string
-    {
-        return $this->getChecksum($chunkId);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getChunkFiles(string $id): Collection
-    {
-        return $this->getLocalFiles($id);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function removeChunk($id): bool
-    {
-        $this->skyttelFiles->setPath($id);
-        foreach ($this->getLocalFiles($id) as $file) {
-            $this->skyttelFiles->rmFile(basename($file->name));
-        }
-        return true;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function import($id): int
+    public function import(string $id, SinkFile $file): int
     {
         $count = 0;
-        foreach ($this->getLocalFiles($id) as $file) {
-            $filePath = $this->skyttelFiles->getDisk()->path($file->name);
-            $count += SkyttelImporter::import($filePath)->getTransactionCount();
+        $extractor = new ChunkExtractor(static::$id, $file);
+        foreach ($extractor->getFiles() as $filepath) {
+            $count += SkyttelImporter::import($filepath)->getTransactionCount();
         }
         return $count;
     }
@@ -115,35 +60,13 @@ class SinkSkyttel extends SinkBase
     /**
      * @inheritdoc
      */
-    public function deleteImport($chunkId): bool
+    public function deleteImport(string $chunkId, SinkFile $file): bool
     {
-        foreach ($this->getLocalFiles($chunkId) as $file) {
-            SkyttelImporter::deleteImport(basename($file->name));
+        $extractor = new ChunkExtractor(static::$id, $file);
+        foreach ($extractor->getFiles() as $filepath) {
+            SkyttelImporter::deleteImport(basename($filepath));
         }
         return true;
-    }
-
-    /**
-     * Create one checksum for all files for given chunk ID.
-     */
-    protected function getChecksum(string $chunkId): string
-    {
-        if (!isset($this->checksums[$chunkId])) {
-            $this->checksums[$chunkId] = $this->getLocalFiles($chunkId)
-                ->pluck('checksums')
-                ->keyBy('name')
-                ->toArray();
-            ksort($this->checksums[$chunkId]);
-        }
-        return md5(implode('', $this->checksums[$chunkId]));
-    }
-
-    /**
-     * @return Collection<array-key, RawFile>
-     */
-    protected function getLocalFiles(string $chunkId): Collection
-    {
-        return $this->skyttelFiles->getFilesLike(sprintf('%%%s%%', $this->dateFilter($chunkId)));
     }
 
     protected function dateFilter(string $chunkId): string
