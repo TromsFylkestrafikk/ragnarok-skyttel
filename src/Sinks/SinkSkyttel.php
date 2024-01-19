@@ -18,6 +18,20 @@ class SinkSkyttel extends SinkBase
     /**
      * @inheritdoc
      */
+    public function destinationTables(): array
+    {
+        return [
+            'skyttel_transaction_batches' => 'Indicates processes status of individual files',
+            'skyttel_transactions' => 'Map between transactions and batches',
+            'skyttel_transaction_salesplace' => 'Meta about each transaction. Device id, device type, lane, line ...',
+            'skyttel_transaction_trips' => 'Meta about vechicle per transaction. Licence plate, ocr confidence, sequence, from-to stops, tour ID, ...',
+            'skyttel_transaction_receipts' => 'Payment with reference to trip: amount, VAT, Toll, discount',
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getFromDate(): Carbon
     {
         return new Carbon('2021-04-21');
