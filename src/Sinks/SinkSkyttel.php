@@ -51,9 +51,14 @@ class SinkSkyttel extends SinkBase
     public function fetch(string $id): SinkFile|null
     {
         $archive = new ChunkArchive(static::$id, $id);
+        $count = 0;
         foreach (SkyttelFiles::getRemoteFileList($this->dateFilter($id)) as $filename) {
             $content = SkyttelFiles::getRemoteFile($filename);
             $archive->addFromString(basename($filename), $content);
+            $count += 1;
+        }
+        if ($count === 0) {
+            $archive->addFromString('NO_FILES_FOUND.txt', 'WARNING: No files found!');
         }
         return $archive->save()->getFile();
     }
@@ -66,6 +71,7 @@ class SinkSkyttel extends SinkBase
         $count = 0;
         $extractor = new ChunkExtractor(static::$id, $file);
         foreach ($extractor->getFiles() as $filepath) {
+            if (strpos($filepath, '.xml') === false) continue;
             $count += SkyttelImporter::import($filepath)->getTransactionCount();
         }
         return $count;
@@ -78,6 +84,7 @@ class SinkSkyttel extends SinkBase
     {
         $extractor = new ChunkExtractor(static::$id, $file);
         foreach ($extractor->getFiles() as $filepath) {
+            if (strpos($filepath, '.xml') === false) continue;
             SkyttelImporter::deleteImport(basename($filepath));
         }
         return true;

@@ -37,6 +37,7 @@ class SkyttelFiles
                 $remoteFiles[$filename] = $candidate;
             }
         }
+        $this->debug('%d files available for download.', count($remoteFiles));
         return $remoteFiles;
     }
 
