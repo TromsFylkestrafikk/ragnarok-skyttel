@@ -49,18 +49,18 @@ return new class extends Migration
             $table->char('StopPlaceIDEntry', 24)->comment('Skyttel internal ID of from port?');
             $table->char('StopPlaceIDExit', 24)->comment('Skyttel internal ID of destination port?');
             $table->boolean('Trailer')->default(false);
-            $table->integer('SignalCode');
+            $table->integer('SignalCode')->nullable();
             $table->integer('MeasuredLength')->nullable();
             $table->integer('Margin')->nullable();
-            $table->char('TariffClass', 16);
-            $table->char('LPNFront', 16)->comment('Licence plate number in front');
-            $table->integer('NationLPNFront')->comment('Nationality of licence plate in front. ID is probably skyttel internal');
-            $table->integer('OCRConfidenceFront')->comment('Optical character recognition read quality of licence plate in front');
-            $table->char('LPNRear', 16)->comment('Rear licence plate number');
-            $table->integer('NationLPNRear')->comment('Nationality of rear licence plate. Skyttel internal country ID, probably');
-            $table->integer('OCRConfidenceRear')->comment('Optical character recognition read quality of rear licence plate');
-            $table->integer('SeqLC')->comment('Unknown');
-            $table->integer('SeqVideo')->comment('Unknown');
+            $table->char('TariffClass', 16)->nullable();
+            $table->char('LPNFront', 16)->nullable()->comment('Licence plate number in front');
+            $table->integer('NationLPNFront')->nullable()->comment('Nationality of licence plate in front. ID is probably skyttel internal');
+            $table->integer('OCRConfidenceFront')->default(0)->comment('Optical character recognition read quality of licence plate in front');
+            $table->char('LPNRear', 16)->nullable()->comment('Rear licence plate number');
+            $table->integer('NationLPNRear')->nullable()->comment('Nationality of rear licence plate. Skyttel internal country ID, probably');
+            $table->integer('OCRConfidenceRear')->default(0)->comment('Optical character recognition read quality of rear licence plate');
+            $table->integer('SeqLC')->comment('Sequence Lane Controller');
+            $table->integer('SeqVideo')->comment('Video sequence number');
         });
 
         Schema::create('skyttel_transaction_receipts', function (Blueprint $table)
