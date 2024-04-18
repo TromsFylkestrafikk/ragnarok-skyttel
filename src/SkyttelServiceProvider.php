@@ -9,7 +9,7 @@ use Ragnarok\Skyttel\Services\SkyttelImporter;
 use Ragnarok\Skyttel\Sinks\SinkSkyttel;
 use Ragnarok\Sink\Facades\SinkRegistrar;
 
-class RagnarokSkyttelServiceProvider extends ServiceProvider
+class SkyttelServiceProvider extends ServiceProvider
 {
     public $singletons = [
         SkyttelFiles::class => SkyttelFiles::class,
@@ -78,5 +78,4 @@ class RagnarokSkyttelServiceProvider extends ServiceProvider
             ], ['config', 'ragnarok_skyttel', 'ragnarok_skyttel.config']);
         }
     }
-
 }

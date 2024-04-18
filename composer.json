@@ -45,14 +45,14 @@
     },
     "repositories": [
         {
-            "type": "github",
-            "url": "https://github.com/TromsFylkestrafikk/ragnarok-sink"
+            "type": "vcs",
+            "url": "https://github.com/tromsfylkestrafikk/ragnarok-sink"
         }
     ],
     "extra": {
         "laravel": {
             "providers": [
-                "Ragnarok\\Skyttel\\RagnarokSkyttelServiceProvider"
+                "Ragnarok\\Skyttel\\SkyttelServiceProvider"
             ]
         }
     }
