@@ -32,16 +32,8 @@ return new class extends Migration
             $table->char('ChargedType')->comment('Unknown. Example values are "STL" and "EASYGO"')->change();
             $table->char('ZeroEmission')->comment('Y/N. Vehicle is electric or otherwise zero emission.')->change();
             $table->char('STLDocumentNo')->comment('Sample values: `GRATIS`, `A1133053`, `IKKEFØRT`')->change();
-            $table->char('Origin')->comment('Always `OPERATOR` it seems')->change();
-            $table->char('STLTicketVersionNo')->comment('Varies between 1-7')->change();
+            $table->char('Origin')->nullable()->comment('Always `OPERATOR` it seems')->change();
+            $table->char('STLTicketVersionNo')->nullable()->comment('Varies between 1-7')->change();
         });
-    }
-
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        //
     }
 };
