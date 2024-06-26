@@ -15,6 +15,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('skyttel_transaction_salesplace', function (Blueprint $table) {
+            $table->integer('ActorID')->comment('Operator ID. 101010: Norled, 101677: Torghatten Nord, 101678: Boreal')->change();
             $table->dropColumn([
                 'Lane',
                 'DeviceType',
@@ -37,6 +38,8 @@ return new class extends Migration
             ]);
         });
         Schema::table('skyttel_transaction_receipts', function (Blueprint $table) {
+            $table->char('TicketCodeCharged', 8)->nullable()->comment('AutoPass code. AP1-9: Classified vehicle length. MC: Motorcycle')->change();
+            $table->char('TicketCodeChargedToll', 8)->nullable()->comment('AutoPass code. AP1-9: Classified vehicle length. MC: Motorcycle')->change();
             $table->dropColumn([
                 'InformationCode',
                 'IssuerIDCharged',
