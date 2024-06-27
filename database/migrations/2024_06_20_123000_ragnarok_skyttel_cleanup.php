@@ -28,11 +28,6 @@ return new class extends Migration
                 'SignalCode',
                 'MeasuredLength',
                 'Margin',
-                'LPNFront',
-                'LPNRear',
-                'NationLPNFront',
-                'OCRConfidenceFront',
-                'OCRConfidenceRear',
                 'SeqLC',
                 'SeqVideo',
             ]);
@@ -66,11 +61,6 @@ return new class extends Migration
             $table->integer('SignalCode')->after('Trailer')->nullable();
             $table->integer('MeasuredLength')->after('SignalCode')->nullable();
             $table->integer('Margin')->after('MeasuredLength')->nullable();
-            $table->char('LPNFront', 16)->after('TariffClass')->nullable()->comment('Licence plate number in front');
-            $table->integer('NationLPNFront')->after('LPNFront')->nullable()->comment('Nationality of licence plate in front. ID is probably skyttel internal');
-            $table->integer('OCRConfidenceFront')->after('NationLPNFront')->default(0)->comment('Optical character recognition read quality of licence plate in front');
-            $table->char('LPNRear', 16)->after('OCRConfidenceFront')->nullable()->comment('Rear licence plate number');
-            $table->integer('OCRConfidenceRear')->after('NationLPNRear')->default(0)->comment('Optical character recognition read quality of rear licence plate');
             $table->integer('SeqLC')->after('OCRConfidenceRear')->comment('Sequence Lane Controller');
             $table->integer('SeqVideo')->after('SeqLC')->comment('Video sequence number');
         });
