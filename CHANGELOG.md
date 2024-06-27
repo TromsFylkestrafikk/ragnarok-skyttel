@@ -5,6 +5,9 @@
 - Increased size of most database char columns to default size (255)
 - Allow null values on STLTicketVersionNo and Origin
 
+### Removed
+- Removed lots of unused db columns.
+
 ## [0.1.0] – 2024-04-18
 
 ### Added
