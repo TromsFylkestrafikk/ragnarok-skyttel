@@ -2,7 +2,8 @@
 
 ## [Unreleased]
 ### Fixed
-- Increased size of most database char columns to default size (255)
+- Increased size of most database columns. char(n) → char(), integer →
+  bigInteger, float → double
 - Allow null values on STLTicketVersionNo and Origin
 
 ### Removed
