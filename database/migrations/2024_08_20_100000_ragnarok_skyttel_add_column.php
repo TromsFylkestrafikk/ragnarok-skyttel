@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('skyttel_transaction_receipts', function (Blueprint $table) {
-            $table->char('InformationCode')->after('ChargedNetAmountToll')->comment('Skyttel internal ID of some sort?');
+            $table->char('InformationCode')->nullable()->after('ChargedNetAmountToll')->comment('Skyttel internal ID of some sort?');
             $table->char('IssuerIDCharged')->nullable()->after('InformationCode')->comment('ID of issuer. 6 digit hex value, often `999999` or null');
         });
     }
