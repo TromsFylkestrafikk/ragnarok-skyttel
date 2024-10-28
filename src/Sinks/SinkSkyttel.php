@@ -15,6 +15,9 @@ class SinkSkyttel extends SinkBase
     public static $id = "skyttel";
     public static $title = "Skyttel";
 
+    // Re-fetch entire previous month on the 6th at 04:00
+    public $cronRefetch = '0 4 6 * *';
+
     /**
      * @inheritdoc
      */
@@ -95,6 +98,17 @@ class SinkSkyttel extends SinkBase
         $matches = [];
         $hits = preg_match('|(?P<date>\d{4}-\d{2}-\d{2})\.zip$|', $filename, $matches);
         return $hits ? $matches['date'] : null;
+    }
+
+    /**
+     * Re-fetch chunks two days behind.
+     */
+    public function refetchIdRange(): array
+    {
+        return [
+            today()->subMonth()->startOfMonth()->format('Y-m-d'),
+            today()->subMonth()->endOfMonth()->format('Y-m-d'),
+        ];
     }
 
     protected function dateFilter(string $chunkId): string
