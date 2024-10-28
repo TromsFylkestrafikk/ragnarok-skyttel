@@ -1,10 +1,6 @@
 # Change Log
 
 ## [Unreleased]
-### Added
-- Implemented re-fetch API to re-fetch all previous month worth of
-  chunks the 6. every month.
-
 ### Fixed
 - Increased size of most database columns. char(n) → char(), integer →
   bigInteger, float → double
